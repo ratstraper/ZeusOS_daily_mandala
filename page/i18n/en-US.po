@@ -4,6 +4,9 @@ msgstr "Daily Mandala"
 msgid "practice"
 msgstr "Today"
 
+msgid "global_help_title"
+msgstr "Help"
+
 msgid "open"
 msgstr "Open"
 
@@ -40,7 +43,7 @@ msgid "err_internet_connection"
 msgstr "Сеть недоступна.\nПроверьте подключение\nтелефона к интернету\nи повторите."
 
 msgid "streak"
-msgstr "Streak"
+msgstr "Streak" //Longest streak:
 
 msgid "best"
 msgstr "Best"
@@ -104,7 +107,6 @@ msgstr "See your personal mandala\nand check if your date\nis still available.\n
 
 msgid "help_practice_slide3_action"
 msgstr "Visit website →"
-
 
 msgid "month_january"
 msgstr "Jan"
@@ -173,3 +175,28 @@ msgstr "Loading..."
 
 msgid "empty_collection"
 msgstr "Collection is empty"
+
+// link
+msgid "linked"
+msgstr "Linked\n[0]"
+
+msgid "qr_expired"
+msgstr "QR expired"
+
+msgid "waiting_wallet"
+msgstr "Waiting for wallet..."
+
+msgid "link_collection"
+msgstr "Link the collection\nin wallet\n[0]\nto this watch?"
+
+msgid "confirm"
+msgstr "Confirm"
+
+msgid "cancel"
+msgstr "Cancel"
+
+msgid "retry"
+msgstr "Retry"
+
+msgid "scan_to_link"
+msgstr "Scan to link"

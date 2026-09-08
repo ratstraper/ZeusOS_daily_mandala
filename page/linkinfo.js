@@ -133,7 +133,6 @@ Page(
       });
       y += UI.btnH;
 
-      // Невидимый "хвост" расширяет область прокрутки под кнопкой
       createWidget(widget.FILL_RECT, {
         x: 0,
         y,

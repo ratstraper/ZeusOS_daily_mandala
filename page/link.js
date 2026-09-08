@@ -1,4 +1,5 @@
 import { createWidget, deleteWidget, widget, align, text_style } from '@zos/ui'
+import { t } from "./../utils/TextUtils.js";
 import { getDeviceInfo } from '@zos/device'
 import {
   setPageBrightTime, resetPageBrightTime,
@@ -25,16 +26,16 @@ Page(BasePage({
   // ── восстановление: сервер — источник истины ────────────────────
   restore() {
     this.stopPolling()
-    this.showWait('Loading...')
+    this.showWait(t("loading"))
     WatchApi.linkStatus(this)
       .then(d => {
         logger.log('restore:', d)
         if (!d || d.status !== 'OK') return this.showDone(false, (d && d.error) || 'Error')
         if (d.link === 'pending_watch_confirm' && d.wallet) this.showConfirm(d.wallet)
-        else if (d.link === 'linked') this.showDone(true, 'Linked\n' + (d.wallet || ''))
+        else if (d.link === 'linked') this.showDone(true, t("linked", d.wallet || ''))
         else this.startLink()
       })
-      .catch(() => this.showDone(false, 'Network error'))
+      .catch(() => this.showDone(false, t("err_internet_connection")))
   },
 
   startLink() {
@@ -46,7 +47,7 @@ Page(BasePage({
         this.showQr(d.qr)
         this.startPolling()
       })
-      .catch(() => this.showDone(false, 'Network error'))
+      .catch(() => this.showDone(false, t("err_internet_connection")))
   },
 
   startPolling() {
@@ -61,7 +62,7 @@ Page(BasePage({
   poll() {
     if (++this.state.ticks > this.state.maxTicks) {
       this.stopPolling()
-      return this.showDone(false, 'QR expired')
+      return this.showDone(false, t("qr_expired"))
     }
     WatchApi.linkStatus(this)
       .then(d => {
@@ -71,7 +72,7 @@ Page(BasePage({
           this.showConfirm(d.wallet)
         } else if (d.link === 'linked') {
           this.stopPolling()
-          this.showDone(true, 'Linked\n' + (d.wallet || ''))
+          this.showDone(true, t("linked", d.wallet || ''))
         }
       })
       .catch(() => {})   // сеть моргнула — ждём следующий тик
@@ -82,9 +83,9 @@ Page(BasePage({
     this.state.busy = true
     WatchApi.linkConfirm(this, { wallet })
       .then(d => d && d.status === 'OK'
-        ? this.showDone(true, 'Linked\n' + wallet)
+        ? this.showDone(true, t("linked", wallet))
         : this.showDone(false, (d && d.error) || 'Error'))
-      .catch(() => this.showDone(false, 'Network error'))
+      .catch(() => this.showDone(false, t("err_internet_connection")))
       .finally(() => { this.state.busy = false })
   },
 
@@ -121,9 +122,10 @@ Page(BasePage({
     setPageBrightTime({ brightTime: 600000 })       // держим экран, пока висит QR
     pauseDropWristScreenOff({ duration: 600000 })
     const size = Math.floor(Math.min(W, H) * 0.55)
+    const title = t("scan_to_link")
     this.add(widget.TEXT, {
       x: 0, y: Math.floor(H * 0.05), w: W, h: 40,
-      text: 'Scan to link', color: 0xffffff, text_size: 28, align_h: align.CENTER_H
+      text: title, color: 0xffffff, text_size: 28, align_h: align.CENTER_H
     })
       const qrPad = px(10)
       const bgX = Math.floor((W - size) / 2);
@@ -143,7 +145,7 @@ Page(BasePage({
     })
     this.add(widget.TEXT, {
       x: 0, y: Math.floor(H * 0.78), w: W, h: 60,
-      text: 'Waiting for wallet...', color: 0x888888, text_size: 22,
+      text: t("waiting_wallet"), color: 0x888888, text_size: 22,
       align_h: align.CENTER_H, text_style: text_style.WRAP
     })
   },
@@ -152,20 +154,20 @@ Page(BasePage({
     this.clear()
     this.add(widget.TEXT, {
       x: 0, y: Math.floor(H * 0.10), w: W, h: 140,
-      text: 'Link wallet\n' + wallet + '\nto this watch?',
+      text: t("link_collection", wallet),
       color: 0xffffff, text_size: 26,
       align_h: align.CENTER_H, text_style: text_style.WRAP
     })
     this.add(widget.BUTTON, {
       x: Math.floor(W * 0.12), y: Math.floor(H * 0.46),
       w: Math.floor(W * 0.76), h: 56, radius: 28,
-      text: 'Confirm', normal_color: 0x00a86b, press_color: 0x007a4d,
+      text: t("confirm"), normal_color: 0x00a86b, press_color: 0x007a4d,
       click_func: () => this.confirm(wallet)
     })
     this.add(widget.BUTTON, {
       x: Math.floor(W * 0.12), y: Math.floor(H * 0.64),
       w: Math.floor(W * 0.76), h: 56, radius: 28,
-      text: 'Cancel', normal_color: 0x333333, press_color: 0x222222,
+      text: t("cancel"), normal_color: 0x333333, press_color: 0x222222,
       click_func: () => this.reject()
     })
   },
@@ -181,7 +183,7 @@ Page(BasePage({
       this.add(widget.BUTTON, {
         x: Math.floor(W * 0.2), y: Math.floor(H * 0.62),
         w: Math.floor(W * 0.6), h: 56, radius: 28,
-        text: 'Retry', normal_color: 0x2d6cdf, press_color: 0x1f4fa3,
+        text: t("retry"), normal_color: 0x2d6cdf, press_color: 0x1f4fa3,
         click_func: () => this.restore()
       })
     }

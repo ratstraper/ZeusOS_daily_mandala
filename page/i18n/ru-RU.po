@@ -4,6 +4,9 @@ msgstr "Daily Mandala"
 msgid "practice"
 msgstr "Практика"
 
+msgid "global_help_title"
+msgstr "Справка/Помощь"
+
 msgid "open"
 msgstr "Открыть"
 
@@ -169,3 +172,28 @@ msgstr "Загрузка..."
 
 msgid "empty_collection"
 msgstr "Коллекция пуста"
+
+// link
+msgid "linked"
+msgstr "Linked\n[0]"
+
+msgid "qr_expired"
+msgstr "QR expired"
+
+msgid "waiting_wallet"
+msgstr "Waiting for wallet..."
+
+msgid "link_collection"
+msgstr "Link the collection\nin wallet\n[0]\nto this watch?"
+
+msgid "confirm"
+msgstr "Confirm"
+
+msgid "cancel"
+msgstr "Cancel"
+
+msgid "retry"
+msgstr "Retry"
+
+msgid "scan_to_link"
+msgstr "Scan to link"

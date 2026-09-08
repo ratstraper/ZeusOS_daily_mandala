@@ -40,7 +40,8 @@ Page(
     state: {
       selectedIndex: -1, // -1 означает, что курсор ни на чем не стоит
       bgRects: [],       // Сюда сложим все фоны кнопок для управления цветом
-      menuItems: []      // Данные меню
+      menuItems: [],     // Данные меню
+      helpItem: null     // Данные для экрана помощи
     },
     widgets: {
       title: null,
@@ -50,6 +51,7 @@ Page(
     },
     build() {
       logger.log(`INDEX.JS`);
+      logger.log(`DEVICE_WIDTH=${DEVICE_WIDTH}, DEVICE_HEIGHT=${DEVICE_HEIGHT}`);
       this.layout = this.createLayout();
       this.loadNews();
 
@@ -59,9 +61,8 @@ Page(
         { id: 'practice', title: i18n("practice"), icon: 'icons/ic_daily.png' },
         { id: 'collection', title: i18n("collection"), icon: 'icons/ic_collection.png' },
       ];
-
+      this.state.helpItem = { id: 'help', title: i18n("global_help_title"), params: JSON.stringify({ slides: SLIDES_MAIN }) };
       const questionIndex = this.state.menuItems.length;
-
 
       // 3. Функция, которая красит нужную кнопку и сбрасывает остальные
       const updateSelection = () => {
@@ -85,11 +86,9 @@ Page(
         let itemY, itemH;
 
         if (index < questionIndex) {
-          // Это стандартная кнопка меню
           itemY = this.layout.startY + index * (this.layout.buttonHeight + this.layout.spacing);
           itemH = this.layout.buttonHeight;
         } else {
-          // Это наша круглая кнопка с вопросом (вычисляем ее координаты)
           itemY = this.layout.startY + questionIndex * (this.layout.buttonHeight + this.layout.spacing) + this.layout.spacing;
           itemH = px(64);
         }
@@ -151,7 +150,6 @@ Page(
       });
 
       const questionY = this.layout.startY + questionIndex * (this.layout.buttonHeight + this.layout.spacing) + this.layout.spacing;
-
       this.widgets.questionImg = hmUI.createWidget(hmUI.widget.IMG, {
         x: (DEVICE_WIDTH - px(64)) / 2,
         y: questionY,
@@ -174,11 +172,7 @@ Page(
         if (this.state.selectedIndex === questionIndex) {
           this.state.selectedIndex = -1;
           updateSelection();
-          this.executeAction({
-            id: 'help',
-            title: 'Справка/Помощь',
-            params: JSON.stringify({ slides: SLIDES_MAIN })
-          });
+          this.executeAction(this.state.helpItem);
         }
       });
 
@@ -204,22 +198,13 @@ Page(
           }
           else if (key === KEY_SELECT) {
             if (this.state.selectedIndex !== -1) {
-
-              // Определяем, какую кнопку мы сейчас активируем
-              let itemToActivate;
+              let item = this.state.helpItem;
               if (this.state.selectedIndex < questionIndex) {
-                itemToActivate = this.state.menuItems[this.state.selectedIndex];
-              } else {
-                itemToActivate = {
-                  id: 'help/index',
-                  title: 'Справка/Помощь',
-                  params: JSON.stringify({ slides: SLIDES_MAIN })
-                };
+                item = this.state.menuItems[this.state.selectedIndex];
               }
-
               this.state.selectedIndex = -1;
               updateSelection();
-              this.executeAction(itemToActivate);
+              this.executeAction(item);
             }
             return true;
           }
@@ -261,12 +246,11 @@ Page(
         push({ url: 'page/nolink' });
       } else {
         let url = `page/${item.id}`;
-        // const pushOptions = { url };
-        // if (item.params) {
-        //   pushOptions.params = item.params;
-        // }
-        // push(pushOptions);
-        push({ url: `page/${item.id}` });
+        const pushOptions = { url };
+        if (item.params) {
+          pushOptions.params = item.params;
+        }
+        push(pushOptions);
       }
     },
 
@@ -308,6 +292,13 @@ Page(
                 scheduleNotification({
                   title: item.title,
                   content: content,
+                  // vibrate: 1,
+                  //   actions: [
+                  //     {
+                  //       text: i18n("open"),
+                  //       file: "page/index",
+                  //     },
+                  //   ],
                 });
               console.log(`Notification scheduled, alarmId=${alarmId}`);
               /*
@@ -336,7 +327,7 @@ Page(
                             }
                             // });
               */
-              // AppStorage.setRecord(STORAGE_KEYS.LAST_NEWS, nowTime);
+              AppStorage.setRecord(STORAGE_KEYS.LAST_NEWS, nowTime);
             } else {
               logger.log("Phone returned error:", data);
             }

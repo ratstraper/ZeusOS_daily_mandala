@@ -1,36 +1,32 @@
 import { set as setAlarm } from "@zos/alarm";
 
-const HALF_HOUR_SECONDS = 1 * 60;
+const HALF_HOUR_SECONDS = 30 * 60;
 
 /**
  * Запланировать показ уведомления через 30 минут.
  */
 export function scheduleNotification(item) {
-    const title = item && item.title ? String(item.title) : "Новое событие";
+    if(!item || !item.title || !item.content) {
+        const title = String(item.title);
+        const content = String(item.content);
+        const param = JSON.stringify({
+            title,
+            content,
+        });
 
-    const content = item && item.content ? String(item.content) : "Тестовый текст";
+        const alarmId = setAlarm({
+            url: "app-service/delayedNewsService",
+            delay: HALF_HOUR_SECONDS,
+            param,
+            store: true, //сохранится даже после перезагрузки часов
+        });
 
-    /*
-     * param должен быть строкой.
-     * JSON.stringify корректно сохраняет русский текст.
-     */
-    const param = JSON.stringify({
-        title,
-        content,
-    });
+        console.log(`[alarm] created id=${alarmId}`);
 
-    const alarmId = setAlarm({
-        url: "app-service/delayedNewsService",
-        delay: HALF_HOUR_SECONDS,
-        param,
-        store: true, //сохранится даже после перезагрузки часов
-    });
-
-    console.log(`[alarm] created id=${alarmId}`);
-
-    if (alarmId === 0) {
-        console.log("[alarm] alarm creation failed");
+        if (alarmId === 0) {
+            console.log("[alarm] alarm creation failed");
+        }
+        return alarmId;
     }
-
-    return alarmId;
+    return 0;
 }
